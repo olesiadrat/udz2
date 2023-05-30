@@ -87,14 +87,16 @@ class Terminal():
         button2 = tk.Button(self.menu_frame, text='Создать заявку на перевоз груза', width=30, command=self.renderOrderFrame)
         button2.pack()
 
-        button3 = tk.Button(self.menu_frame, text='Просмотреть транспорт \n по грузоподъемности', width=30)
-        button3.pack()
+        # button3 = tk.Button(self.menu_frame, text='Просмотреть транспорт \n по грузоподъемности', width=30)
+        # button3.pack()
 
-        button4 = tk.Button(self.menu_frame, text='Подобрать и забронировать транспорт', width=30)
-        button4.pack()
+        # button4 = tk.Button(self.menu_frame, text='Подобрать и забронировать транспорт', width=30)
+        # button4.pack()
 
-        button5 = tk.Button(self.menu_frame, text='Посмотреть занятый транспорт', width=30)
-        button5.pack()
+        # button5 = tk.Button(self.menu_frame, text='Посмотреть занятый транспорт', width=30)
+        # button5.pack()
+
+
 
     def renderOrderFrame(self):
         # Этот метод отрисовывает экран заказа
@@ -122,7 +124,24 @@ class Terminal():
         self.r3 = Entry(self.order_frame)
         self.r3.grid(row=3, column=1)
 
+        self.orderButton = Button(self.order_frame, text='Подобрать', command=self.orderb)
+        self.orderButton.grid(row=4, column=0, columnspan=3)
+
         self.order_frame.pack()
+
+    def orderb(self):
+        print("!!!")
+        weight = int(self.r1.get())
+        width = int(self.r2.get())
+        height = int(self.r3.get())
+        self.av_trucks = []
+        for i in self.trucks: 
+            if i.weight >= weight and i.height >= height and i.width >= width:
+                self.av_trucks.append(i)
+        print(self.av_trucks)
+        self.renderTrucks(self.order_frame, self.av_trucks, 5)
+  
+        
         
         
 
@@ -140,7 +159,7 @@ class Terminal():
         else:
             self.filterButton.config(text='↑')
         self.trucks_frame.destroy()
-        self.renderTrucks()
+        self.renderTrucks(self.available_frame, self.trucks, 1)
 
     def sortByWeight(self):
         swapped = False
@@ -154,13 +173,13 @@ class Terminal():
             if not swapped: return
 
 
-    def renderTrucks(self):
-        self.trucks_frame = Frame(self.available_frame)
-        for i in range(len(self.trucks)):    
+    def renderTrucks(self, parent_frame, array,r):
+        self.trucks_frame = Frame(parent_frame)
+        for i in range(len(array)):    
 
-            Label(self.trucks_frame, text=self.trucks[i].name).grid(row=i, column=1)
-            Label(self.trucks_frame, text=self.trucks[i].weight).grid(row=i, column=2)
-        self.trucks_frame.grid(row=1, columnspan=3)
+            Label(self.trucks_frame, text=array[i].name).grid(row=i, column=1)
+            Label(self.trucks_frame, text=array[i].weight).grid(row=i, column=2)
+        self.trucks_frame.grid(row=r, columnspan=3)
 
 
 
@@ -177,7 +196,7 @@ class Terminal():
         self.avalibleCheckboxState = StringVar()
         
         self.sortByWeight()
-        self.renderTrucks()
+        self.renderTrucks(self.available_frame, self.trucks, 1)
         
         self.available_frame.pack()
           
