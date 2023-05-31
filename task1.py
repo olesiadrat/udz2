@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 import tkinter as tk
 
 class Truck(): # класс родителя, содержащий информацию по умолчанию о каждом грузовике
@@ -67,7 +68,7 @@ class Terminal():
         self.order = []
         self.trucks = [Gazel(True), Bull(False), Man(False), Fura(False)]
         self.main = tk.Tk()
-        self.main.geometry('500x500')
+        self.main.geometry('400x300')
         self.main.configure(bg='SkyBlue1')
         self.main.title('ООО "LesyaTrucks"')
     
@@ -77,7 +78,7 @@ class Terminal():
         self.menu_frame = tk.Frame(self.main) # Главный фрейм
         self.menu_frame.pack()
 
-        self.menu_label = tk.Label(self.menu_frame, text='Главное меню :', width=300, bg='#B3E5FC')
+        self.menu_label = tk.Label(self.menu_frame, text='Главное меню :', width=30)
         self.menu_label.pack()
 
         ########################
@@ -90,8 +91,8 @@ class Terminal():
         button2 = tk.Button(self.menu_frame, text='Создать заявку на перевоз груза', width=30, command=self.renderOrderFrame)
         button2.pack()
 
-        
-
+        button3 = tk.Button(self.menu_frame, text='Добавить транспорт', width=30, command=self.renderAddingFrame) 
+        button3.pack()
 
     def renderOrderFrame(self):
         # Этот метод отрисовывает экран заказа
@@ -127,41 +128,28 @@ class Terminal():
     
     def orderb(self):
         # Подбирает грузовики под параметр 
-        # Нужно реализовать проверку корректности параметров
-        weight = int(self.r1.get())
-        width = int(self.r2.get())
-        height = int(self.r3.get())
-        """f = 0
-        if self.checkInput(self.r1.get()): weight = int(self.r1.get())
-        else:
-            f = 1
-            self.labelError = Label(self.order_frame, text='Некорректный ввод. Введите габариты груза цифрами')
-            self.labelError.pack()
-        if self.checkInput(self.r2.get()): width = int(self.r2.get())
-        else:
-            f = 1
-            self.labelError = Label(self.order_frame, text='Некорректный ввод. Введите габариты груза цифрами')
-            self.labelError.pack()
-        if self.checkInput(self.r1.get()): height = int(self.r3.get())
-        else:
-            f = 1
-            self.labelError = Label(self.order_frame, text='Некорректный ввод. Введите габариты груза цифрами')
-            self.labelError.pack()"""
+        try:
+            weight = int(self.r1.get())
+            width = int(self.r2.get())
+            height = int(self.r3.get())
+        except:
+            messagebox.showerror('Некорректный ввод', 'Введите габариты груза цифрами!')
         self.av_trucks = []
 
         for i in self.trucks: 
             if i.weight >= weight and i.height >= height and i.width >= width and not(i.isOrdered): # Проверяем подходит ли каждый грузовик по размерам
                 self.av_trucks.append(i)
         self.renderTrucks(self.order_frame, self.av_trucks, 5, True) # Отрисовываем список грузовиков из массива av_trucks
-        """else:
-            self.labelError = Label(self.order_frame, text='Свободных грузовиков нет')
-            self.labelError.pack()"""
 
     def backToMenu(self, frame):
         # Метод для кнопки назад
         # Принимает в качестве параметра frame - тот фрейм который нужно удалить (т е текущий, в котором мы были)
         frame.destroy()
         self.renderMainMenu() # Отрисовываем главное меню
+
+    def backToOrder(self, frame):
+        frame.destroy()
+        self.renderOrderFrame()
 
 
     def changeSort(self):
@@ -188,12 +176,40 @@ class Terminal():
                     arr[i], arr[i + 1] = arr[i + 1], arr[i]       
             if not swapped: return
 
+    def renderAddingFrame(self):
+        # Этот метод отрисовывает фрейм добавления машины
+        self.menu_frame.destroy()
+
+        self.add_frame = Frame(self.main) # Добавляем фрейм добавления машины
+        self.add_frame.pack()
+        # Кнопка возвращения в меню
+        self.buttonBack = Button(self.add_frame, text='<', command=lambda frame = self.add_frame: self.backToMenu(frame)) # Кнопка для возвращения в главное меню, вызывает функцию backToMenu
+        self.buttonBack.grid(row=0, column=0)
+        Label(self.add_frame, text='Добавление машины').grid(row=0, column=1)
+
+        Label(self.add_frame, text='Марка грузовика').grid(row=1, column=0)
+        self.car_input = Entry(self.add_frame).grid(row=1,column=1)
+
+        Label(self.add_frame, text='Грузоподъемность').grid(row=2, column=0)
+        self.weight_input = Entry(self.add_frame).grid(row=2, column=1)
+
+        Label(self.add_frame, text='Длина').grid(row=3, column=0)
+        self.width_input = Entry(self.add_frame).grid(row=3, column=1)
+        
+        Label(self.add_frame, text='Ширина').grid(row=4, column=0)
+        self.width_input = Entry(self.add_frame).grid(row=4, column=1)
+
+        Label(self.add_frame, text='Высота').grid(row=5, column=0)
+        self.height_input = Entry(self.add_frame).grid(row=5, column=1)
+
+        confirm = Button(self.add_frame, text='Подтвердить')
+        confirm.grid(row=6, column=1)
     def orderTruck(self, name):
-        self.renderCustomerFrame()
         # Функция которая изменяет статус грузовика на забронированный
         for i in self.trucks:
             if i.name == name: # Находим грузовик в массиве грузовиков по его имени
                 i.isOrdered = True # Меняем его статус
+                self.renderCustomerFrame()
                 break
         
     def renderCustomerFrame(self):
@@ -201,6 +217,7 @@ class Terminal():
         self.order_frame.destroy()
 
         self.customer_frame = Frame(self.main)
+        self.customer_frame.pack()
         self.entry = Label(self.customer_frame, text='Введите свое имя').grid(row=0, column=0)
         self.customer = Entry(self.customer_frame)
         self.customer.grid(row=0, column=1)
@@ -220,6 +237,8 @@ class Terminal():
             Label(self.trucks_frame, text=array[i].weight).grid(row=i, column=2)
             if orderMode: # Если orderMode == True => рисуем кнопку забронировать 
                 Button(self.trucks_frame, text='Забронировать', command=lambda name = array[i].name: self.orderTruck(name)).grid(row=i, column=3) # Кнопка забронировать, вызывает функцию orderTruck при клике с параметром name
+        if len(array) == 0:
+            messagebox.showerror('Ошибка', 'На данный момент доступных грузовиков \n по данным габаритам нет')
         self.trucks_frame.grid(row=r, columnspan=3)
 
 
@@ -289,12 +308,6 @@ class Terminal():
         self.filterByStatus() # Запускаем фильтр (по умолчанию показывает все грузовики) и эта функция вызывает потом renderTrucks => отрисовываем грузовики
         self.available_frame.pack()
 
-    def checkInput(self, text):
-        for i in text:
-            if i.isdigit() == False:
-                return False
-        return True
-    
     def start(self):
         self.renderMainMenu()
         self.main.mainloop()
