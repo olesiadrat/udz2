@@ -218,15 +218,20 @@ class Terminal():
     def renderCustomerFrame(self):
         # Отрисовываем фрейм для оформления заказа
         self.order_frame.destroy()
-
+        
         self.customer_frame = Frame(self.main)
         self.customer_frame.pack()
-
-        Label(self.customer_frame, text='Введите свое имя').grid(row=0, column=0)
+        Button(self.customer_frame, text='<', command=lambda frame = self.order_frame: self.backToOrder(self.customer_frame)).grid(row=0, column=0)
+        Label(self.customer_frame, text='Введите свое имя').grid(row=1, column=0)
         self.customer = Entry(self.customer_frame)
-        self.customer.grid(row=0, column=1)
+        self.customer.grid(row=1, column=1)
+        Button(self.customer_frame, text='Забронировать', command=self.bookTruck).grid(row=2)
+    
+    def bookTruck(self):
         database = Database()
-        database.add_orders(self.customer, self.car, self.weight, self.width, self.height)
+        database.add_orders(self.customer.get(), self.car, self.weight, self.width, self.height)
+        messagebox.showinfo('Успешно', 'Грузовик забронирован')
+
 
     def renderTrucks(self, parent_frame, array,r, orderMode=False):
         # На вход функция получает:
