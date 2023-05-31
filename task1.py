@@ -2,13 +2,13 @@ from tkinter import *
 import tkinter as tk
 
 class Truck(): # класс родителя, содержащий информацию по умолчанию о каждом грузовике
-    def __init__(self, name, weight, length, width, height):
+    def __init__(self, name, weight, length, width, height, isOrdered):
         self.name = name
         self.weight = weight
         self.length = length
         self.width = width
         self.height = height
-        self.isOrdered = False 
+        self.isOrdered = isOrdered 
     
     def get_weight(self):
         return self.weight
@@ -29,8 +29,8 @@ class Gazel(Truck):
         length = 3
         width = 2
         height = 2.2
-        status = status
-        super().__init__(name, weight, length, width, height)
+        isOrdered = status
+        super().__init__(name, weight, length, width, height, isOrdered)
 
 class Bull(Truck):
     def __init__(self, status):
@@ -39,8 +39,8 @@ class Bull(Truck):
         length = 5
         width = 2.2
         height = 2.4
-        status = status
-        super().__init__(name, weight, length, width, height)
+        isOrdered = status
+        super().__init__(name, weight, length, width, height, isOrdered)
 
 class Man(Truck):
     def __init__(self, status):
@@ -49,8 +49,8 @@ class Man(Truck):
         length = 8
         width = 2.45
         height = 2.7
-        status = status
-        super().__init__(name, weight, length, width, height)
+        isOrdered = status
+        super().__init__(name, weight, length, width, height, isOrdered)
 
 class Fura(Truck):
 
@@ -60,15 +60,15 @@ class Fura(Truck):
         length = 13.6
         width = 2.46
         height = 2.7
-        status = status
-        super().__init__(name, weight, length, width, height)
+        isOrdered = status
+        super().__init__(name, weight, length, width, height, isOrdered)
 
 class Terminal():
     def __init__(self):
         self.order = []
-        self.trucks = [Gazel(True), Bull(False), Man(False), Fura(True)]
+        self.trucks = [Gazel(True), Bull(False), Man(False), Fura(False)]
         self.main = tk.Tk()
-        self.main.geometry('400x400')
+        self.main.geometry('500x500')
         self.main.configure(bg='SkyBlue1')
         self.main.title('ООО "LesyaTrucks"')
     
@@ -136,10 +136,10 @@ class Terminal():
         height = int(self.r3.get())
         self.av_trucks = []
         for i in self.trucks: 
-            if i.weight >= weight and i.height >= height and i.width >= width:
+            if i.weight >= weight and i.height >= height and i.width >= width and not(i.isOrdered):
                 self.av_trucks.append(i)
         print(self.av_trucks)
-        self.renderTrucks(self.order_frame, self.av_trucks, 5)
+        self.renderTrucks(self.order_frame, self.av_trucks, 5, True)
   
         
         
@@ -153,17 +153,18 @@ class Terminal():
 
 
     def changeSort(self):
-        self.trucks = self.trucks[::-1]
+
+        self.renderTruckList = self.renderTruckList[::-1]
         if self.filterButton['text'] == '↑':
             self.filterButton.config(text='↓')
         else:
             self.filterButton.config(text='↑')
         self.trucks_frame.destroy()
-        self.renderTrucks(self.available_frame, self.trucks, 1)
+        self.renderTrucks(self.available_frame, self.renderTruckList, 1)
 
     def sortByWeight(self):
         swapped = False
-        arr = self.trucks
+        arr = self.renderTruckList
 
         for n in range(len(arr)-1, 0, -1):
             for i in range(n):
@@ -172,18 +173,65 @@ class Terminal():
                     arr[i], arr[i + 1] = arr[i + 1], arr[i]       
             if not swapped: return
 
+    def orderTruck(self, name):
+        for i in self.trucks:
+            if i.name == name:
+                i.isOrdered = True 
+                break
+        
 
-    def renderTrucks(self, parent_frame, array,r):
+
+    def renderTrucks(self, parent_frame, array,r, orderMode=False):
+        print(array)
+        try: self.trucks_frame.destroy()
+        except: pass
         self.trucks_frame = Frame(parent_frame)
         for i in range(len(array)):    
 
             Label(self.trucks_frame, text=array[i].name).grid(row=i, column=1)
             Label(self.trucks_frame, text=array[i].weight).grid(row=i, column=2)
+            if orderMode:
+                Button(self.trucks_frame, text='Забронировать', command=lambda name = array[i].name: self.orderTruck(name)).grid(row=i, column=3)
         self.trucks_frame.grid(row=r, columnspan=3)
 
 
+    def fitlerTrucks(self, arr, ordered=None):
+        print(self.trucks)
+        self.renderTruckList = []
+        if ordered==None:
+            self.renderTruckList = self.trucks
+        for i in arr:
+            if ordered:
+                if i.isOrdered:
+                    self.renderTruckList.append(i)
+            else:
+                if not(i.isOrdered):
+                    self.renderTruckList.append(i)
+        # print(a)
+        return self.renderTruckList
+    
+    def filterByStatus(self):
+        self.filterMode+=1
+        print(self.filterMode)
+        if self.filterMode%3==0:
+            self.filterStatusButton.config(text='Все')
+            print(self.filterMode)
+            self.sortByWeight()
+            self.renderTruckList = self.trucks
+            self.renderTrucks(self.available_frame, self.trucks, 1)
+        elif self.filterMode%3==1:
+            self.filterStatusButton.config(text='Занятые')
+            print(self.filterMode)
+            self.sortByWeight()
+            self.renderTrucks(self.available_frame, self.fitlerTrucks(self.trucks, True), 1)
+        else:
+            print(self.filterMode)
+            self.filterStatusButton.config(text='Свободные')
+            self.sortByWeight()
+            self.renderTrucks(self.available_frame, self.fitlerTrucks(self.trucks, False), 1)
 
-
+        pass 
+ 
     def renderAvalibleFrame(self):
         self.menu_frame.destroy()
         self.available_frame = Frame(self.main)
@@ -193,10 +241,13 @@ class Terminal():
         self.label2 = Label(self.available_frame, text='Грузоподъемность').grid(row=0, column=2)
         self.filterButton = Button(self.available_frame, text='↑', command=self.changeSort)
         self.filterButton.grid(row=0, column=3)
-        self.avalibleCheckboxState = StringVar()
-        
-        self.sortByWeight()
-        self.renderTrucks(self.available_frame, self.trucks, 1)
+        self.filterMode = -1
+        self.filterStatusButton = Button(self.available_frame, text='Свободные', command=self.filterByStatus)
+        self.filterStatusButton.grid(row=0, column=4)
+        self.renderTruckList = self.trucks
+        self.filterByStatus()
+        # self.sortByWeight()
+        # self.renderTrucks(self.available_frame, self.trucks, 1)
         
         self.available_frame.pack()
           
