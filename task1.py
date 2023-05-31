@@ -124,20 +124,38 @@ class Terminal():
         self.orderButton.grid(row=4, column=0, columnspan=3)
 
         self.order_frame.pack()
-
+    
     def orderb(self):
         # Подбирает грузовики под параметр 
         # Нужно реализовать проверку корректности параметров
         weight = int(self.r1.get())
         width = int(self.r2.get())
         height = int(self.r3.get())
+        """f = 0
+        if self.checkInput(self.r1.get()): weight = int(self.r1.get())
+        else:
+            f = 1
+            self.labelError = Label(self.order_frame, text='Некорректный ввод. Введите габариты груза цифрами')
+            self.labelError.pack()
+        if self.checkInput(self.r2.get()): width = int(self.r2.get())
+        else:
+            f = 1
+            self.labelError = Label(self.order_frame, text='Некорректный ввод. Введите габариты груза цифрами')
+            self.labelError.pack()
+        if self.checkInput(self.r1.get()): height = int(self.r3.get())
+        else:
+            f = 1
+            self.labelError = Label(self.order_frame, text='Некорректный ввод. Введите габариты груза цифрами')
+            self.labelError.pack()"""
         self.av_trucks = []
+
         for i in self.trucks: 
             if i.weight >= weight and i.height >= height and i.width >= width and not(i.isOrdered): # Проверяем подходит ли каждый грузовик по размерам
                 self.av_trucks.append(i)
-        # print(self.av_trucks)
         self.renderTrucks(self.order_frame, self.av_trucks, 5, True) # Отрисовываем список грузовиков из массива av_trucks
-  
+        """else:
+            self.labelError = Label(self.order_frame, text='Свободных грузовиков нет')
+            self.labelError.pack()"""
 
     def backToMenu(self, frame):
         # Метод для кнопки назад
@@ -171,12 +189,21 @@ class Terminal():
             if not swapped: return
 
     def orderTruck(self, name):
-        # Функция которая изменяет статус грузовика на забронированный 
+        self.renderCustomerFrame()
+        # Функция которая изменяет статус грузовика на забронированный
         for i in self.trucks:
             if i.name == name: # Находим грузовик в массиве грузовиков по его имени
                 i.isOrdered = True # Меняем его статус
                 break
         
+    def renderCustomerFrame(self):
+        # Отрисовываем фрейм для оформления заказа
+        self.order_frame.destroy()
+
+        self.customer_frame = Frame(self.main)
+        self.entry = Label(self.customer_frame, text='Введите свое имя').grid(row=0, column=0)
+        self.customer = Entry(self.customer_frame)
+        self.customer.grid(row=0, column=1)
 
 
     def renderTrucks(self, parent_frame, array,r, orderMode=False):
@@ -261,8 +288,13 @@ class Terminal():
         
         self.filterByStatus() # Запускаем фильтр (по умолчанию показывает все грузовики) и эта функция вызывает потом renderTrucks => отрисовываем грузовики
         self.available_frame.pack()
-          
-        
+
+    def checkInput(self, text):
+        for i in text:
+            if i.isdigit() == False:
+                return False
+        return True
+    
     def start(self):
         self.renderMainMenu()
         self.main.mainloop()
