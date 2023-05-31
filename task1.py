@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
+from databases import *
 import tkinter as tk
 
 class Truck(): # класс родителя, содержащий информацию по умолчанию о каждом грузовике
@@ -129,16 +130,17 @@ class Terminal():
     def orderb(self):
         # Подбирает грузовики под параметр 
         try:
-            weight = int(self.r1.get())
-            width = int(self.r2.get())
-            height = int(self.r3.get())
+            self.weight = int(self.r1.get())
+            self.width = int(self.r2.get())
+            self.height = int(self.r3.get())
         except:
-            messagebox.showerror('Некорректный ввод', 'Введите габариты груза цифрами!')
+            messagebox.showerror('Некорректный ввод', 'Проверьте корректность ввода')
         self.av_trucks = []
-
         for i in self.trucks: 
-            if i.weight >= weight and i.height >= height and i.width >= width and not(i.isOrdered): # Проверяем подходит ли каждый грузовик по размерам
+            if i.weight >= self.weight and i.height >= self.height and i.width >= self.width and not(i.isOrdered): # Проверяем подходит ли каждый грузовик по размерам
                 self.av_trucks.append(i)
+                self.car = i.name
+
         self.renderTrucks(self.order_frame, self.av_trucks, 5, True) # Отрисовываем список грузовиков из массива av_trucks
 
     def backToMenu(self, frame):
@@ -204,6 +206,7 @@ class Terminal():
 
         confirm = Button(self.add_frame, text='Подтвердить')
         confirm.grid(row=6, column=1)
+
     def orderTruck(self, name):
         # Функция которая изменяет статус грузовика на забронированный
         for i in self.trucks:
@@ -218,10 +221,12 @@ class Terminal():
 
         self.customer_frame = Frame(self.main)
         self.customer_frame.pack()
-        self.entry = Label(self.customer_frame, text='Введите свое имя').grid(row=0, column=0)
+
+        Label(self.customer_frame, text='Введите свое имя').grid(row=0, column=0)
         self.customer = Entry(self.customer_frame)
         self.customer.grid(row=0, column=1)
-
+        database = Database()
+        database.add_orders(self.customer, self.car, self.weight, self.width, self.height)
 
     def renderTrucks(self, parent_frame, array,r, orderMode=False):
         # На вход функция получает:
