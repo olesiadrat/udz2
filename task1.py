@@ -95,6 +95,8 @@ class Terminal():
         button3 = tk.Button(self.menu_frame, text='Добавить транспорт', width=30, command=self.renderAddingFrame) 
         button3.pack()
 
+
+
     def renderOrderFrame(self):
         # Этот метод отрисовывает экран заказа
 
@@ -188,24 +190,37 @@ class Terminal():
         self.buttonBack = Button(self.add_frame, text='<', command=lambda frame = self.add_frame: self.backToMenu(frame)) # Кнопка для возвращения в главное меню, вызывает функцию backToMenu
         self.buttonBack.grid(row=0, column=0)
         Label(self.add_frame, text='Добавление машины').grid(row=0, column=1)
+        self.var = StringVar(value='0')
 
         Label(self.add_frame, text='Марка грузовика').grid(row=1, column=0)
-        self.car_input = Entry(self.add_frame).grid(row=1,column=1)
+        self.car1_input = Radiobutton(self.add_frame, text='Газель', variable=self.var, value='0').grid(row=1,column=1)
+        self.car2_input = Radiobutton(self.add_frame, text='Бычок', variable=self.var, value='1').grid(row=2,column=1)
+        self.car3_input = Radiobutton(self.add_frame, text='MAN-10', variable=self.var, value='2').grid(row=3,column=1)
+        self.car4_input = Radiobutton(self.add_frame, text='Фура', variable=self.var, value='3').grid(row=4,column=1)
 
-        Label(self.add_frame, text='Грузоподъемность').grid(row=2, column=0)
-        self.weight_input = Entry(self.add_frame).grid(row=2, column=1)
+        Label(self.add_frame, text='Грузоподъемность').grid(row=5, column=0)
+        self.weight_input = Entry(self.add_frame).grid(row=5, column=1)
 
-        Label(self.add_frame, text='Длина').grid(row=3, column=0)
-        self.width_input = Entry(self.add_frame).grid(row=3, column=1)
+        Label(self.add_frame, text='Длина').grid(row=6, column=0)
+        self.length_input = Entry(self.add_frame).grid(row=6, column=1)
         
-        Label(self.add_frame, text='Ширина').grid(row=4, column=0)
-        self.width_input = Entry(self.add_frame).grid(row=4, column=1)
+        Label(self.add_frame, text='Ширина').grid(row=7, column=0)
+        self.width_input = Entry(self.add_frame).grid(row=7, column=1)
 
-        Label(self.add_frame, text='Высота').grid(row=5, column=0)
-        self.height_input = Entry(self.add_frame).grid(row=5, column=1)
+        Label(self.add_frame, text='Высота').grid(row=8, column=0)
+        self.height_input = Entry(self.add_frame).grid(row=8, column=1)
 
-        confirm = Button(self.add_frame, text='Подтвердить')
-        confirm.grid(row=6, column=1)
+        confirm = Button(self.add_frame, text='Подтвердить', command=self.add_truck)
+        confirm.grid(row=9, column=1)
+
+    def add_truck(self):
+        try:
+            self.weight = int(self.weight_input.get())
+            self.length = int(self.length_input.get())
+            self.width = int(self.width_input.get())
+            self.height = int(self.height_input.get())
+        except: 
+            messagebox.showerror('Некорректный ввод', 'Проверьте корректность ввода') 
 
     def orderTruck(self, name):
         # Функция которая изменяет статус грузовика на забронированный
@@ -214,6 +229,7 @@ class Terminal():
                 i.isOrdered = True # Меняем его статус
                 self.renderCustomerFrame()
                 break
+
         
     def renderCustomerFrame(self):
         # Отрисовываем фрейм для оформления заказа
@@ -221,17 +237,29 @@ class Terminal():
         
         self.customer_frame = Frame(self.main)
         self.customer_frame.pack()
+# <<<<<<< HEAD
+# =======
+
+# >>>>>>> 31adb9f3fdd0c5dbe56c8a3399c4a81585b4b7e4
         Button(self.customer_frame, text='<', command=lambda frame = self.order_frame: self.backToOrder(self.customer_frame)).grid(row=0, column=0)
         Label(self.customer_frame, text='Введите свое имя').grid(row=1, column=0)
         self.customer = Entry(self.customer_frame)
         self.customer.grid(row=1, column=1)
+# <<<<<<< HEAD
         Button(self.customer_frame, text='Забронировать', command=self.bookTruck).grid(row=2)
     
+# =======
+        Button(self.customer_frame, text='Забронировать', command=self.bookTruck).grid(row=2, column=1)
+        
+# >>>>>>> 31adb9f3fdd0c5dbe56c8a3399c4a81585b4b7e4
     def bookTruck(self):
         database = Database()
         database.add_orders(self.customer.get(), self.car, self.weight, self.width, self.height)
         messagebox.showinfo('Успешно', 'Грузовик забронирован')
+# <<<<<<< HEAD
 
+# =======
+# >>>>>>> 31adb9f3fdd0c5dbe56c8a3399c4a81585b4b7e4
 
     def renderTrucks(self, parent_frame, array,r, orderMode=False):
         # На вход функция получает:
