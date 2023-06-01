@@ -27,7 +27,7 @@ class TrucksDatabase():
         self.conn.commit()
         self.close_connection()
 
-    def add_orders(self, name, weight, length, width, height):
+    def add_truck(self, name, weight, length, width, height):
         self.open_connection()
         self.cur.execute('INSERT into tTrucks (name, weight, length, width, height) VALUES(?, ?, ?, ?, ?)',
                           (name, weight, length, width, height)
@@ -35,13 +35,13 @@ class TrucksDatabase():
         self.conn.commit()
         self.close_connection()
 
-    def get_orders(self):
+    def get_trucks(self):
         self.open_connection()
         self.cur.execute('SELECT * from tTrucks')
         a = self.cur.fetchall()
         self.close_connection()
         return a
     
-t = TrucksDatabase()
-t.add_orders('Газель', 2, 3, 2, 2.2)
-print(t.get_orders())
+# t = TrucksDatabase()
+# t.add_orders('Газель', 2, 3, 2, 2.2)
+# print(t.get_orders())

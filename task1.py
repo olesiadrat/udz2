@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 from databases import *
 import tkinter as tk
+from trucks import TrucksDatabase
 
 class Truck(): # класс родителя, содержащий информацию по умолчанию о каждом грузовике
     def __init__(self, name, weight, length, width, height, isOrdered):
@@ -67,11 +68,26 @@ class Fura(Truck):
 class Terminal():
     def __init__(self):
         self.order = []
-        self.trucks = [Gazel(True), Bull(False), Man(False), Fura(False)]
+        # self.trucks = [Gazel(True), Bull(False), Man(False), Fura(False)]
+        self.trucks = self.loadTrucks()
         self.main = tk.Tk()
         self.main.geometry('400x300')
         self.main.configure(bg='SkyBlue1')
         self.main.title('ООО "LesyaTrucks"')
+        self.loadTrucks()
+
+
+    def loadTrucks(self):
+        db = TrucksDatabase().get_trucks()
+        print(db)
+        truck_list = []
+        for i in db:
+            truck_list.append(Truck(i[1], i[2], i[3], i[4], i[5], False))
+            ################################################
+            # Вот тут последний аргумент - False - это статус грузовика 
+            # После того как будешь хранить в базе данных статус - поставь там i[6]
+            ################################################
+        return truck_list
     
 
     def renderMainMenu(self):
@@ -193,22 +209,26 @@ class Terminal():
         self.var = StringVar(value='0')
 
         Label(self.add_frame, text='Марка грузовика').grid(row=1, column=0)
-        self.car1_input = Radiobutton(self.add_frame, text='Газель', variable=self.var, value='0').grid(row=1,column=1)
-        self.car2_input = Radiobutton(self.add_frame, text='Бычок', variable=self.var, value='1').grid(row=2,column=1)
-        self.car3_input = Radiobutton(self.add_frame, text='MAN-10', variable=self.var, value='2').grid(row=3,column=1)
-        self.car4_input = Radiobutton(self.add_frame, text='Фура', variable=self.var, value='3').grid(row=4,column=1)
+        self.car1_input = Radiobutton(self.add_frame, text='Газель', variable=self.var, value='Газель').grid(row=1,column=1)
+        self.car2_input = Radiobutton(self.add_frame, text='Бычок', variable=self.var, value='Бычок').grid(row=2,column=1)
+        self.car3_input = Radiobutton(self.add_frame, text='MAN-10', variable=self.var, value='MAN-10').grid(row=3,column=1)
+        self.car4_input = Radiobutton(self.add_frame, text='Фура', variable=self.var, value='Фура').grid(row=4,column=1)
 
         Label(self.add_frame, text='Грузоподъемность').grid(row=5, column=0)
-        self.weight_input = Entry(self.add_frame).grid(row=5, column=1)
+        self.weight_input = Entry(self.add_frame)
+        self.weight_input.grid(row=5, column=1)
 
         Label(self.add_frame, text='Длина').grid(row=6, column=0)
-        self.length_input = Entry(self.add_frame).grid(row=6, column=1)
+        self.length_input = Entry(self.add_frame)
+        self.length_input.grid(row=6, column=1)
         
         Label(self.add_frame, text='Ширина').grid(row=7, column=0)
-        self.width_input = Entry(self.add_frame).grid(row=7, column=1)
+        self.width_input = Entry(self.add_frame)
+        self.width_input.grid(row=7, column=1)
 
         Label(self.add_frame, text='Высота').grid(row=8, column=0)
-        self.height_input = Entry(self.add_frame).grid(row=8, column=1)
+        self.height_input = Entry(self.add_frame)
+        self.height_input.grid(row=8, column=1)
 
         confirm = Button(self.add_frame, text='Подтвердить', command=self.add_truck)
         confirm.grid(row=9, column=1)
@@ -221,6 +241,9 @@ class Terminal():
             self.height = int(self.height_input.get())
         except: 
             messagebox.showerror('Некорректный ввод', 'Проверьте корректность ввода') 
+
+        TrucksDatabase().add_truck(self.var.get(), self.weight, self.length, self.width, self.height)
+        messagebox.showinfo('ok', 'грузовик добавлен')
 
     def orderTruck(self, name):
         # Функция которая изменяет статус грузовика на забронированный
@@ -267,6 +290,7 @@ class Terminal():
         # array - массив с грузовиками которые нам нужно отрисовать 
         # r - строка в grid в родительском фрейме
         # orderMode - True/False - добавляет кнопку брони при True (для order_frame)
+        
         try: self.trucks_frame.destroy() # Пробуем удалить фрейм с грузовиками если он уже есть 
         except: pass
         self.trucks_frame = Frame(parent_frame) # Создаем фрейм в родительском фрейме
@@ -323,6 +347,7 @@ class Terminal():
  
     def renderAvalibleFrame(self): 
         # Отрисовываем экран доступных машин
+        self.trucks = self.loadTrucks()
         self.menu_frame.destroy() # Удаляем экран главного меню
         self.available_frame = Frame(self.main)
 
