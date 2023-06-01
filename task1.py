@@ -82,7 +82,7 @@ class Terminal():
         print(db)
         truck_list = []
         for i in db:
-            truck_list.append(Truck(i[1], i[2], i[3], i[4], i[5], False))
+            truck_list.append(Truck(i[1], i[2], i[3], i[4], i[5], bool(i[6])))
             ################################################
             # Вот тут последний аргумент - False - это статус грузовика 
             # После того как будешь хранить в базе данных статус - поставь там i[6]
@@ -140,8 +140,12 @@ class Terminal():
         self.r3 = Entry(self.order_frame)
         self.r3.grid(row=3, column=1)
 
+        self.label4 = Label(self.order_frame, text='Ширина груза').grid(row=4, column=0)
+        self.r4 = Entry(self.order_frame)
+        self.r4.grid(row=4, column=1)
+
         self.orderButton = Button(self.order_frame, text='Подобрать', command=self.orderb) # Кнопка подобрать вызывает при клике функцию orderb
-        self.orderButton.grid(row=4, column=0, columnspan=3)
+        self.orderButton.grid(row=5, column=0, columnspan=3)
 
         self.order_frame.pack()
     
@@ -150,6 +154,7 @@ class Terminal():
         try:
             self.weight = int(self.r1.get())
             self.width = int(self.r2.get())
+            self.length = int(self.r4.get())
             self.height = int(self.r3.get())
         except:
             messagebox.showerror('Некорректный ввод', 'Проверьте корректность ввода')
@@ -242,7 +247,7 @@ class Terminal():
         except: 
             messagebox.showerror('Некорректный ввод', 'Проверьте корректность ввода') 
 
-        TrucksDatabase().add_truck(self.var.get(), self.weight, self.length, self.width, self.height)
+        TrucksDatabase().add_truck(self.var.get(), self.weight, self.length, self.width, self.height, 0)
         messagebox.showinfo('ok', 'грузовик добавлен')
 
     def orderTruck(self, name):
@@ -278,6 +283,7 @@ class Terminal():
     def bookTruck(self):
         database = Database()
         database.add_orders(self.customer.get(), self.car, self.weight, self.width, self.height)
+        TrucksDatabase().bookTruck(self.car, self.weight, self.length, self.width, self.height, 0)
         messagebox.showinfo('Успешно', 'Грузовик забронирован')
 # <<<<<<< HEAD
 

@@ -9,7 +9,9 @@ class TrucksDatabase():
             weight INTEGER NOT NULL,
             length INTEGER NOT NULL,
             width INTEGER NOT NULL,
-            height INTEGER NOT NULL)"""
+            height INTEGER NOT NULL,
+            status INTEGER)
+            """
                     ) # создаем таблицу с информацией о грузовиках
         self.close_connection()
         
@@ -27,10 +29,10 @@ class TrucksDatabase():
         self.conn.commit()
         self.close_connection()
 
-    def add_truck(self, name, weight, length, width, height):
+    def add_truck(self, name, weight, length, width, height, status):
         self.open_connection()
-        self.cur.execute('INSERT into tTrucks (name, weight, length, width, height) VALUES(?, ?, ?, ?, ?)',
-                          (name, weight, length, width, height)
+        self.cur.execute('INSERT into tTrucks (name, weight, length, width, height, status) VALUES(?, ?, ?, ?, ?, ?)',
+                          (name, weight, length, width, height, status)
                          )
         self.conn.commit()
         self.close_connection()
@@ -41,6 +43,18 @@ class TrucksDatabase():
         a = self.cur.fetchall()
         self.close_connection()
         return a
+    
+    def bookTruck(self, name, weight, length, width, height, status):
+        self.open_connection()
+        self.cur.execute('DELETE from tTrucks where name=? and weight = ? and length = ? and width =? and height=?' ,
+                          (name, weight, length, width, height)
+                         )
+        self.cur.execute('INSERT into tTrucks (name, weight, length, width, height, status) VALUES(?, ?, ?, ?, ?, ?)',
+                          (name, weight, length, width, height, 1)
+                         )
+        
+        self.conn.commit()
+        self.close_connection()
     
 # t = TrucksDatabase()
 # t.add_orders('Газель', 2, 3, 2, 2.2)
